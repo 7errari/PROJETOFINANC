@@ -98,12 +98,8 @@ public class TransactionPanel extends JPanel {
                 double amount;
                 try {
                     amount = Double.parseDouble(txtAmount.getText().replace(",", "."));
-                    if (amount <= 0) { 
-                        double amount;
-                try {
-                    amount = Double.parseDouble(txtAmount.getText().replace(",", "."));
                     if (amount <= 0) {
-                        throw new NumberFormatException();
+                         throw new NumberFormatException();
                     }
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this, "Por favor, insira um valor válido maior que zero!", 
