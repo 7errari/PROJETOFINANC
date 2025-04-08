@@ -98,4 +98,75 @@ public class TransactionPanel extends JPanel {
                 double amount;
                 try {
                     amount = Double.parseDouble(txtAmount.getText().replace(",", "."));
+                    if (amount <= 0) { 
+                        double amount;
+                try {
+                    amount = Double.parseDouble(txtAmount.getText().replace(",", "."));
                     if (amount <= 0) {
+                        throw new NumberFormatException();
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Por favor, insira um valor válido maior que zero!", 
+                        "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                TransactionType type = (TransactionType) cmbType.getSelectedItem();
+                Category category = (Category) cmbCategory.getSelectedItem();
+                
+                if (category == null) {
+                    JOptionPane.showMessageDialog(this, "Por favor, selecione uma categoria!", 
+                        "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                java.util.Date date = (java.util.Date) dateSpinner.getValue();
+                LocalDate localDate = date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+                
+                // Adiciona a transação
+                transactionController.addTransaction(amount, txtDescription.getText(), localDate, type, category);
+                
+                JOptionPane.showMessageDialog(this, "Transação cadastrada com sucesso!", 
+                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Limpa os campos
+                clearFields();
+                
+                // Atualiza outras abas se necessário
+                if (getParent() instanceof JTabbedPane) {
+                    JTabbedPane pane = (JTabbedPane) getParent();
+                    Component comp = pane.getComponentAt(0); // Dashboard
+                    if (comp instanceof DashboardPanel) {
+                        ((DashboardPanel) comp).refresh();
+                    }
+                    
+                    comp = pane.getComponentAt(2); // Histórico
+                    if (comp instanceof HistoryPanel) {
+                        ((HistoryPanel) comp).refreshTable();
+                    }
+                }
+                
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao cadastrar transação: " + ex.getMessage(), 
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        btnClear.addActionListener(e -> {
+            clearFields();
+        });
+    }
+    
+    private void clearFields() {
+        txtAmount.setText("");
+        txtDescription.setText("");
+        cmbType.setSelectedIndex(0);
+        cmbCategory.setSelectedIndex(0);
+        dateSpinner.setValue(new java.util.Date());
+    }
+    
+    // Método para atualizar o painel
+    public void refresh() {
+        updateCategoryComboBox();
+    }
+}
